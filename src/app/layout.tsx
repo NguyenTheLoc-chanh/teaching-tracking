@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Inter } from "next/font/google";
+import '@/app/globals.css'
+import { ThemeRegistry } from "./ThemeProvider";
+import { Box, Stack } from "@mui/material";
+import NextAuthWrapper from "@/library/next.auth.wrapper";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,8 +19,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={inter.className}>
+        <ThemeRegistry>
+          <Stack minHeight={"100vh"}>
+              <Box component={"main"} flexGrow={1}>
+                <NextAuthWrapper>
+                  {children} 
+                </NextAuthWrapper> 
+              </Box>
+          </Stack>
+        </ThemeRegistry>
       </body>
     </html>
   );
