@@ -40,6 +40,5 @@ declare global {
         },
         access_token: string;
     }
-
 }
 
