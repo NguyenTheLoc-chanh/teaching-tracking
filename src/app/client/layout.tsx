@@ -18,39 +18,80 @@ export default function ClientLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeRegistry>
-          <Container>
-            <Header/>
+          <Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+            
+            {/* Menu bên trái - Cố định */}
+            <Box
+              sx={{
+                width: 260,
+                backgroundColor: '#121C3E',
+                padding: 2,
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                height: "100vh",
+                overflowY: "auto",
+                zIndex: 1000, // Đảm bảo luôn nổi
+              }}
+            >
+              <ClientMenu />
+            </Box>
 
-            <Footer/>
-            <Stack direction={'row'} minHeight={"100vh"}>
-                <Box 
-                  sx={{
-                  width: 260,  // Chiều rộng cố định cho menu
-                  backgroundColor: '#121C3E',  // Màu nền menu
-                  padding: 2,  // Padding cho menu
-                  position: 'fixed',  // Menu sẽ luôn cố định khi cuộn
-                  top: 0,  // Gắn menu vào đầu trang
-                  height: '100vh',  // Menu sẽ có chiều cao bằng chiều cao cửa sổ
-                }}
-                >
-                  <ClientMenu/>
-                </Box>
-                <Box
-                component="main"
-                flexGrow={1}  // Chiếm hết không gian còn lại
+            {/* Vùng chính (Header + Nội dung + Footer) */}
+            <Box
+              sx={{
+                marginLeft: "260px", // Đẩy nội dung qua phải do menu chiếm 260px
+                display: "flex",
+                flexDirection: "column",
+                width: "calc(100% - 260px)", // Trừ chiều rộng menu
+                minHeight: "100vh",
+              }}
+            >
+              {/* Header - Cố định nhưng dưới Menu */}
+              <Box
                 sx={{
-                  padding: 3,  // Padding cho nội dung
-                  marginLeft: '260px',
-                  marginTop: '56px',
-                  overflowY: 'auto',  // Thêm scroll nếu nội dung quá dài
-                  height: 'auto',
-                  overflow: 'hidden'  // Chiều cao bằng chiều cao cửa sổ
+                  position: "fixed",
+                  top: 0,
+                  left: "260px",
+                  width: "calc(100% - 260px)",
+                  zIndex: 999,
+                  backgroundColor: "white",
+                  boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
                 }}
               >
-                {children}  {/* Hiển thị nội dung trang */}
+                <Header />
               </Box>
-            </Stack>
-          </Container>
+
+              {/* Nội dung chính - Có thể cuộn */}
+              <Box
+                component="main"
+                flexGrow={1}
+                sx={{
+                  padding: 3,
+                  marginTop: "56px", // Đẩy xuống dưới Header
+                  height: "calc(100vh - 112px)", // Trừ header (56px) + footer (56px)
+                  overflowY: "auto",
+                }}
+              >
+                {children}
+              </Box>
+
+              {/* Footer - Cố định nhưng dưới Menu */}
+              <Box
+                sx={{
+                  position: "fixed",
+                  bottom: 0,
+                  left: "260px",
+                  width: "calc(100% - 260px)",
+                  zIndex: 999,
+                  backgroundColor: "white",
+                  boxShadow: "0px -2px 5px rgba(0,0,0,0.1)",
+                }}
+              >
+                <Footer />
+              </Box>
+            </Box>
+          </Box>
         </ThemeRegistry>
       </body>
     </html>

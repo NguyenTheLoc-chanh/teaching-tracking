@@ -5,7 +5,7 @@ declare global {
     interface IRequest {
         url: string;
         method: string;
-        body?: { [key: string]: any };
+        body?: { [key: string]: any } | string;
         queryParams?: any;
         useCredentials?: boolean;
         headers?: any;

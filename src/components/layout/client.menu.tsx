@@ -23,7 +23,7 @@ const ClientMenu = () =>{
             <Stack direction={'row'} spacing={3} justifyContent={'center'} alignItems={'center'}>
                 <Image src={avatar} layout='intrinsic' alt='logoHou' width={60} height={60}/>
                 <Box color={'white'}>
-                    <Typography>{session?.user?.lecturer.full_name ?? "ABC"}</Typography>
+                    <Typography>{session?.user?.lecturer.full_name ?? ""}</Typography>
                     <Typography >{session?.user?.name ?? ""}</Typography>
                 </Box>
             </Stack>
