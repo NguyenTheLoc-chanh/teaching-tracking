@@ -23,6 +23,7 @@ interface ITeachingLog {
     date: Date;
     lesson_count: number;
     students_present: number;
+    teaching_log_id: string;
     session_status: string;
     subject: {
         name: string; // Tên môn học

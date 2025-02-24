@@ -74,14 +74,17 @@ const ClientMenu = () =>{
                     </Link>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{pl: 0}}>
-                            <ListItemIcon>
-                            <Image src={salary} layout='intrinsic' alt='Icons' 
-                                width={22} 
-                                height={22}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Xem bảng lương"/>
-                        </ListItemButton>
+                        <Link href="/client/salaries" passHref 
+                            style={{textDecoration: 'none', color: '#fff'}}>
+                            <ListItemButton sx={{pl: 0}}>
+                                <ListItemIcon>
+                                    <Image src={book} layout='intrinsic' alt='Icons' 
+                                        width={22} 
+                                        height={22}/>
+                                </ListItemIcon>
+                                <ListItemText primary="Xem bảng lương" />
+                            </ListItemButton>
+                        </Link>
                     </ListItem>
                     </List>
                 </nav>

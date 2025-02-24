@@ -13,6 +13,7 @@ interface ITeachingLog {
     date: Date;
     lesson_count: number;
     students_present: number;
+    teaching_log_id: string;
     session_status: string;
     subject: {
       name: string; // Tên môn học
@@ -38,10 +39,47 @@ export async function handleConfirmServer(selectedLog: ITeachingLog, studentsPre
       }
     });
 
-    if (response.status === 200) {
-      return { success: true };
+    if (response.status !== 200) {
+      return { success: false, message: 'Cập nhật không thành công!' };
     }
-    return { success: false, message: 'Error confirming' };
+
+    const date = new Date(selectedLog.date).toISOString();
+    if (!date) {
+      return { success: false, message: 'Date is required' };
+    }
+    const allowanceResponse = await axios.get(`http://localhost:8080/api/v1/allowance-details/determine/${selectedLog.teaching_log_id}`,{
+      params: { date: date }, 
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.user?.access_token}`,
+      }
+    });
+    
+    const allowanceIds = allowanceResponse.data.data;
+    if (!allowanceIds || allowanceIds.length === 0) {
+      return { success: false, message: 'Không tìm thấy phụ cấp' };
+    }
+    try {
+      const updateResponse = await axios.patch(
+        `http://localhost:8080/api/v1/allowance-details/update`,
+        {
+          allowanceIds: allowanceIds,
+          trackingId: selectedLog.teaching_log_id,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.user?.access_token}`,
+          },
+        }
+      );
+    
+      console.log("Response:", updateResponse.data);
+    } catch (error) {
+      console.error("Error updating allowance detail:",error);
+    }
+
+    return { success: true, message: 'Cập nhật thành công!' };
   } catch (error) {
     console.error('Error confirming session:', error);
     return { success: false, message: error };
