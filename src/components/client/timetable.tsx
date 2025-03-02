@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Alert, Box, Button, FormControl, InputLabel, MenuItem, Modal, Paper, Select, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/vi";
-import { handleConfirmLeaveNoticeServer, handleConfirmServer, handleUpdateSessionServer } from "@/app/client/timetable/handleConfirm";
+import { CreateOrUpdateSalary, handleConfirmLeaveNoticeServer, handleConfirmServer, handleUpdateSessionServer } from "@/app/client/timetable/handleConfirm";
 import useSWR from "swr";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -18,7 +18,6 @@ interface IWeek {
 interface ITeachingLog {
     _id: string;
     class_id: string;
-    timetable_id: string;
     session: string;
     date: Date;
     lesson_count: number;
@@ -26,7 +25,7 @@ interface ITeachingLog {
     teaching_log_id: string;
     session_status: string;
     subject: {
-        name: string; // Tên môn học
+        name: string;
     };
     room: string;
 }
@@ -132,8 +131,9 @@ const TimeTableCom = ({ weeks }: { weeks: IWeek[]}) => {
             return;
         }
         const response = await handleConfirmServer(selectedLog, studentsPresent, content);
+        const responseSalary = await CreateOrUpdateSalary(selectedLog);
 
-        if(response.success){
+        if(response.success && responseSalary.success){
             handleCloseModal();
             mutate();
             setOpenSnackbar(true);

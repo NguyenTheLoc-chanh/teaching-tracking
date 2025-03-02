@@ -8,7 +8,6 @@ import { NextResponse } from "next/server";
 interface ITeachingLog {
     _id: string;
     class_id: string;
-    timetable_id: string;
     session: string;
     date: Date;
     lesson_count: number;
@@ -118,7 +117,6 @@ export async function handleUpdateSessionServer(selectedLog: ITeachingLog, updat
   }
   const body = {
     class_id: selectedLog.class_id,
-    timetable_id: selectedLog.timetable_id,
     session: sessionNew,
     date: updateDate,
     lesson_count: selectedLog.lesson_count,
@@ -148,6 +146,52 @@ export async function handleUpdateSessionServer(selectedLog: ITeachingLog, updat
     return { success: false, message: error };
   }
 }
+
+export async function CreateOrUpdateSalary(selectedLog: ITeachingLog) {
+  const session = await auth();
+
+
+  if (!session?.user?.access_token) {
+    return { success: false, message: "Bạn chưa đăng nhập!" };
+  }
+
+  try {
+    // Lấy timetable_id từ class_id của selectedLog
+    const timetableResponse = await axios.get(
+      "http://localhost:8080/api/v1/classrooms",{
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.user?.access_token}`,
+        },
+        params: { classId: selectedLog.class_id },
+      }
+    );
+
+    if (timetableResponse.status !== 200 || !timetableResponse.data) {
+      return { success: false, message: "Không lấy được mã thời khóa biểu!" };
+    }
+    const timetableId = timetableResponse.data.data; // Lấy timetable_id từ response
+    
+    const response = await axios.get(
+      "http://localhost:8080/api/v1/salaries", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session?.user?.access_token}`,
+      },
+      params: { timetable_id: timetableId },
+    });
+
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    } else {
+      return { success: false, message: "Lấy dữ liệu lương không thành công!" };
+    }
+  } catch (error) {
+    console.error("Error fetching salary:", error);
+    return { success: false, message: "Lỗi khi lấy dữ liệu lương" };
+  }
+}
+
 
 
 
