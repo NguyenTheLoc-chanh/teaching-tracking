@@ -18,7 +18,7 @@ export default function ClientLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeRegistry>
-          <Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+          <Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh"}}>
             
             {/* Menu bên trái - Cố định */}
             <Box

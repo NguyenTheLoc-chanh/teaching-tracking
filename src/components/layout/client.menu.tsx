@@ -112,14 +112,17 @@ const ClientMenu = () =>{
                     </Link>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{pl: 0}}>
-                            <ListItemIcon>
-                            <Image src={book} layout='intrinsic' alt='Icons' 
-                                width={22} 
-                                height={22}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Xem lịch học kỳ"/>
-                        </ListItemButton>
+                        <Link href="/client/semestercalendar" passHref 
+                            style={{textDecoration: 'none', color: '#fff'}}>
+                            <ListItemButton sx={{pl: 0}}>
+                                <ListItemIcon>
+                                    <Image src={book} layout='intrinsic' alt='Icons' 
+                                        width={22} 
+                                        height={22}/>
+                                </ListItemIcon>
+                                <ListItemText primary="Xem lịch học kỳ" />
+                            </ListItemButton>
+                        </Link>
                     </ListItem>
                     </List>
                 </nav>
