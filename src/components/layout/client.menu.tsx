@@ -1,7 +1,7 @@
 'use client'
-import { Box, Divider, Icon, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Icon, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
 import logoHouTech from '../../../images/logo_houtech.png';
 import avatar from '../../../images/avatar.png';
@@ -12,9 +12,31 @@ import book from '../../../images/book.png';
 
 import Link from "next/link";
 import { AttachMoney, AttachMoneySharp, InboxSharp, Person } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const ClientMenu = () =>{
     const { data: session, status } = useSession()
+    const router = useRouter();
+    
+    const handleLogout = async () => {
+        try {
+            const token = session?.access_token;
+            await axios.post("http://localhost:8080/api/v1/auth/logout", {}, {
+                headers: 
+                { 
+                    'Authorization': `Bearer ${session?.user?.access_token}`, 
+                }
+            });
+
+            await signOut({ redirect: false })
+            router.push("auth/login");
+            signOut(); // Đăng xuất khỏi NextAuth
+            router.push("auth/login"); // Chuyển hướng về trang login
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
     return (
         <Box>
             <Box textAlign={'center'} mb={5}>
@@ -127,6 +149,22 @@ const ClientMenu = () =>{
                     </List>
                 </nav>
             </Box>
+            <Button 
+                onClick={handleLogout} 
+                sx={{
+                    mt: 8,
+                    width: "100%",
+                    backgroundColor: "#FF0000",
+                    boxShadow: "13px 4px 14px rgba(0, 0, 0, 0.12)",
+                    borderRadius: "14px",
+                    color: "white",
+                    fontWeight: "bold",
+                    "&:hover": {
+                        backgroundColor: "#D00000",
+                    },
+                }}>
+                Đăng xuất
+            </Button>
         </Box>
     )
 }

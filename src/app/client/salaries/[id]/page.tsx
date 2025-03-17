@@ -40,6 +40,7 @@ const SalaryDetailsPage = async ({ params }: { params: { id: string } }) =>{
     ]);
 
     const salaryRes = salaryDetail.data;
+    console.log("Salary:", salaryDetail.data);
     if (!salaryDetail.data) {
         return <Typography textAlign="center" mt={5}>Không tìm thấy dữ liệu phiếu lương.</Typography>;
     }
@@ -47,15 +48,18 @@ const SalaryDetailsPage = async ({ params }: { params: { id: string } }) =>{
     if (!salaryRes || !Array.isArray(salaryRes.breakdown)) {
         return <Typography textAlign="center" mt={5}>Dữ liệu phiếu lương không hợp lệ.</Typography>;
     }
-    const classIds = salaryRes.breakdown.map((item) => item.class_id);
+    const classIds = salaryRes.breakdown.map((item) => item.class_id.trim());
+    const queryString = classIds.join(",");
+    console.log("ClassID:",queryString);
     const subjectResponse = await sendRequest<{ statusCode: number; data: { data: ISubject[] }}>({
-        url: `http://localhost:8080/api/v1/subjects/by-class-ids?classIds=${classIds.join(",")}`,
+        url: `http://localhost:8080/api/v1/subjects/by-class-ids?classIds=${queryString}`,
         method: "GET",
         headers: {
             Authorization: `Bearer ${session?.user?.access_token}`,
         },
     });
     const subjects = Array.isArray(subjectResponse?.data?.data) ? subjectResponse.data?.data : [];
+    console.log("Subject:", subjects);
     return <SalaryDetailsCom subjects={subjects} salarydetails = {salaryDetail.data}/>
 }
 

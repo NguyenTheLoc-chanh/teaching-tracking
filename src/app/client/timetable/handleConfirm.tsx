@@ -56,7 +56,7 @@ export async function handleConfirmServer(selectedLog: ITeachingLog, studentsPre
     
     const allowanceIds = allowanceResponse.data.data;
     if (!allowanceIds || allowanceIds.length === 0) {
-      return { success: false, message: 'Không tìm thấy phụ cấp' };
+      return { success: true, message: 'Cập nhật thành công!' };
     }
     try {
       const updateResponse = await axios.patch(
@@ -166,7 +166,6 @@ export async function CreateOrUpdateSalary(selectedLog: ITeachingLog) {
         params: { classId: selectedLog.class_id },
       }
     );
-
     if (timetableResponse.status !== 200 || !timetableResponse.data) {
       return { success: false, message: "Không lấy được mã thời khóa biểu!" };
     }

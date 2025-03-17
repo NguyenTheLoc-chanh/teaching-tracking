@@ -1,5 +1,5 @@
 'use client'
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, Modal, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import avatar from '../../../../images/avatar.png';
@@ -10,14 +10,19 @@ import dayjs from "dayjs";
 
 interface ILecturer {
     lecturer_id: string;
+    full_name: string;
     date_of_birth: string;
     gender: string;
     title: string;
+    address: string;
 }
 
 const InformationPage = () => {
     const { data: session, status } = useSession();
     const [lecturer, setLecturer] = useState<ILecturer | null>(null);
+
+    const [open, setOpen] = useState(false);
+    const [editedData, setEditedData] = useState<Partial<ILecturer>>({});
     
     useEffect(() => {
         const fetchLecturerInfo = async () => {
@@ -31,6 +36,7 @@ const InformationPage = () => {
                         },
                     });
                     setLecturer(response.data);
+                    setEditedData(response.data); // Gán dữ liệu ban đầu vào form
                 } catch (error) {
                     console.error("Lỗi khi tải thông tin giảng viên:", error);
                 }
@@ -39,6 +45,32 @@ const InformationPage = () => {
 
         fetchLecturerInfo();
     }, [session]);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedData({ ...editedData, [e.target.name]: e.target.value });
+    };
+
+    const handleSave = async () => {
+        try {
+            await sendRequest({
+                url: `http://localhost:8080/api/v1/lecturers/update`,
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${session?.user?.access_token}`,
+                },
+                body: JSON.stringify(editedData),
+            });
+            setLecturer(editedData as ILecturer); // Cập nhật UI
+            handleClose();
+        } catch (error) {
+            console.error("Lỗi khi cập nhật thông tin:", error);
+        }
+    };
+
     return (
     <Box sx={{ bgcolor: "#f5f5f5", py: 4 }}>
         <Container maxWidth="md">
@@ -87,6 +119,7 @@ const InformationPage = () => {
                                             "&:hover": { bgcolor: "lightgray" }
                                         }}
                                         size="small"
+                                        onClick={handleOpen}
                                     >
                                         <Image
                                         src={edit}
@@ -105,19 +138,26 @@ const InformationPage = () => {
                                 <Typography textAlign="center" color="text.secondary">
                                     {session?.user?.name ?? "Không có thông tin"}
                                 </Typography>
-                                <Box mt={4}>
-                                    <Typography color="text.secondary" mb={2}>
-                                        <b>Chức vụ:</b> {lecturer?.title ?? "Chưa có"}
-                                    </Typography>
-                                    <Typography color="text.secondary" mb={2}>
-                                        <b>Giới tính:</b> {lecturer?.gender === "Male" ? "Nam" : lecturer?.gender === "Female" ? "Nữ" : "Chưa cập nhật"}
-                                    </Typography>
-                                    <Typography color="text.secondary" mb={2}>
-                                        <b>Ngày sinh:</b> {lecturer?.date_of_birth ? 
-                                        dayjs(lecturer.date_of_birth).format("DD/MM/YYYY") 
-                                        : "Chưa cập nhật"}
-                                    </Typography>
-                                </Box>
+                                <Stack mt={4} direction={'row'} justifyContent={'space-around'}>
+                                    <Box>
+                                        <Typography color="text.secondary" mb={2}>
+                                            <b>Chức vụ:</b> {lecturer?.title ?? "Chưa có"}
+                                        </Typography>
+                                        <Typography color="text.secondary" mb={2}>
+                                            <b>Giới tính:</b> {lecturer?.gender === "Male" ? "Nam" : lecturer?.gender === "Female" ? "Nữ" : "Chưa cập nhật"}
+                                        </Typography>
+                                        <Typography color="text.secondary" mb={2}>
+                                            <b>Ngày sinh:</b> {lecturer?.date_of_birth ? 
+                                            dayjs(lecturer.date_of_birth).format("DD/MM/YYYY") 
+                                            : "Chưa cập nhật"}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography color="text.secondary" mb={2}>
+                                            <b>Địa chỉ:</b> {lecturer?.address ?? "Chưa có"}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
                             </Box>
                             </Stack>
                         </CardContent>
@@ -125,6 +165,50 @@ const InformationPage = () => {
                 </Grid>
             </Grid>
         </Container>
+        {/* Modal cập nhật thông tin */}
+        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
+            <Box sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 2
+            }}>
+                <Typography id="modal-title" variant="h6" mb={2}>Cập nhật thông tin</Typography>
+                <Stack spacing={2}>
+                    <TextField
+                        label="Họ và tên"
+                        name="full_name"
+                        fullWidth
+                        value={editedData.full_name ?? ""}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        label="Ngày sinh"
+                        name="date_of_birth"
+                        fullWidth
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        value={editedData.date_of_birth ?? ""}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        label="Địa chỉ"
+                        name="address"
+                        fullWidth
+                        value={editedData.address ?? ""}
+                        onChange={handleChange}
+                    />
+                    <Button variant="contained" color="primary" onClick={handleSave}>
+                        Lưu thay đổi
+                    </Button>
+                </Stack>
+            </Box>
+        </Modal>
     </Box>
     );
 }

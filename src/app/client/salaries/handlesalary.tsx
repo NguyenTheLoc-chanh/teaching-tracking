@@ -15,7 +15,6 @@ export async function handleSelectSubject(classId: string) {
                   params: { classId: classId },
             }
         );
-        console.log("data:", infoClass.data);
         if (infoClass.status === 200) {
             return { success: true, data: infoClass.data };
           } else {
@@ -38,7 +37,6 @@ export async function handleSelectSalaryDetails(classId: string) {
                   }
             }
         );
-        console.log("data:", infoSalaryDetails.data.data);
         if (infoSalaryDetails.status === 200) {
             return { success: true, data: infoSalaryDetails.data };
           } else {

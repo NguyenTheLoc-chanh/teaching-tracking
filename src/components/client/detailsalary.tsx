@@ -39,6 +39,7 @@ interface ISalaryDetailAPI {
     quota_value: number;
     student_count: number;
     nfCredit: number;
+    min_lessons: number;
     breakdown: {
         class_id: string;
         teachingSalary: number;
@@ -56,6 +57,72 @@ interface ISalaryDetailAPI {
     }[];
     is_paid: boolean;
 }
+const mergeAllowances = (accAllowances: any[] = [], currAllowances: any[] = []) => {
+    const merged = [...accAllowances];
+
+    currAllowances.forEach(currAllowance => {
+        const existing = merged.find(item => item.allowance_id === currAllowance.allowance_id);
+        if (existing) {
+            existing.quantity += currAllowance.quantity;
+        } else {
+            merged.push({ ...currAllowance });
+        }
+    });
+
+    return merged;
+};
+
+const aggregateSalaryDetails = (salaryDetailsArray: ISalaryDetailAPI[] | null): ISalaryDetailAPI => {
+    if (!salaryDetailsArray || salaryDetailsArray.length === 0) {
+        return {} as ISalaryDetailAPI;
+    }
+
+    return salaryDetailsArray.reduce((acc: ISalaryDetailAPI, curr: ISalaryDetailAPI,index) => {
+        if (!curr) return acc;
+
+        return {
+            lecturer_id: curr.lecturer_id,
+            timetable_id: "all",
+            total_salary: acc.total_salary + curr.total_salary,
+            quota_value: index === 0 ? curr.quota_value : acc.quota_value,
+            student_count: acc.student_count + curr.student_count,
+            nfCredit: acc.nfCredit + curr.nfCredit,
+            min_lessons: acc.min_lessons + curr.min_lessons,
+            breakdown: {
+                class_id: curr.breakdown.class_id,
+                teachingSalary: acc.breakdown.teachingSalary + curr.breakdown.teachingSalary,
+                gradingAllowance: acc.breakdown.gradingAllowance + curr.breakdown.gradingAllowance,
+                travelAllowance: acc.breakdown.travelAllowance + curr.breakdown.travelAllowance,
+                mealAllowance: acc.breakdown.mealAllowance + curr.breakdown.mealAllowance,
+                eveningMealAllowance: acc.breakdown.eveningMealAllowance + curr.breakdown.eveningMealAllowance,
+                totalClassSalary: acc.breakdown.totalClassSalary + curr.breakdown.totalClassSalary,
+            },
+            allowances: mergeAllowances(acc.allowances, curr.allowances),
+            is_paid: acc.is_paid && curr.is_paid
+        };
+    }, {
+        lecturer_id: "",
+        timetable_id: "",
+        total_salary: 0,
+        quota_value: 0,
+        student_count: 0,
+        nfCredit: 0,
+        min_lessons: 0,
+        breakdown: {
+            class_id: "",
+            teachingSalary: 0,
+            gradingAllowance: 0,
+            travelAllowance: 0,
+            mealAllowance: 0,
+            eveningMealAllowance: 0,
+            totalClassSalary: 0,
+        },
+        allowances: [],
+        is_paid: true
+    });
+};
+
+
 const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[], salarydetails: ISalaryDetail}) => {
     const [selectedSubject, setSelectedSubject] = useState<ISubject | null>(
         subjects.length > 0 ? subjects[0] : null
@@ -84,18 +151,29 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
 
     const handleSelectChange = async (event: any) => {
         const selectedClassId = event.target.value;
-        const foundSubject = subjects.find((subject) => subject.class_id === selectedClassId);
-        setSelectedSubject(foundSubject || null);
+        if (selectedClassId === "all") {
+            // Lấy dữ liệu tất cả các lớp học
+            const allSalaryDetails = await Promise.all(
+                subjects.map(subject => handleSelectSalaryDetails(subject.class_id))
+            );
+    
+            const aggregatedSalary = aggregateSalaryDetails(allSalaryDetails.map(res => res.data?.data));
+            setSalaryDetailsAPI(aggregatedSalary);
+            setSelectedSubject(null);
+        } else {
+            const foundSubject = subjects.find((subject) => subject.class_id === selectedClassId);
+            setSelectedSubject(foundSubject || null);
 
-        if (foundSubject) {
-            const resInfoClass = await handleSelectSubject(selectedClassId);
-            const salaryDetailsApi = await handleSelectSalaryDetails(selectedClassId);
-            if (resInfoClass.success) {
-                setClassDetails(resInfoClass.data?.data); // Gán dữ liệu lấy từ API vào state
-                setSalaryDetailsAPI(salaryDetailsApi.data?.data);
-            } else {
-                setClassDetails(null);
-                setSalaryDetailsAPI(null);
+            if (foundSubject) {
+                const resInfoClass = await handleSelectSubject(selectedClassId);
+                const salaryDetailsApi = await handleSelectSalaryDetails(selectedClassId);
+                if (resInfoClass.success) {
+                    setClassDetails(resInfoClass.data?.data); // Gán dữ liệu lấy từ API vào state
+                    setSalaryDetailsAPI(salaryDetailsApi.data?.data);
+                } else {
+                    setClassDetails(null);
+                    setSalaryDetailsAPI(null);
+                }
             }
         }
     };
@@ -114,23 +192,24 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                             padding: 0,
                             position: 'relative',
                             '.MuiInputLabel-root': {
-                            top: '-5px', // Điều chỉnh vị trí của InputLabel để phù hợp chiều cao
-                            fontSize: '14px', // Giảm kích thước font nếu cần
-                            lineHeight: '36px', // Căn chỉnh giữa
+                            top: '-5px', 
+                            fontSize: '14px', 
+                            lineHeight: '36px', 
                             },
                             '.MuiSelect-select': {
                             height: '36px',
-                            padding: '0 8px', // Loại bỏ padding mặc định và giữ khoảng cách nhỏ
+                            padding: '0 8px',
                             display: 'flex',
-                            alignItems: 'center', // Căn chỉnh nội dung trong Select
+                            alignItems: 'center',
                             },
                             '.MuiOutlinedInput-notchedOutline': {
-                            border: '1px solid #ccc', // Tùy chỉnh viền nếu cần
+                            border: '1px solid #ccc',
                             height: '36px',
                             },
                         }}
                         >
-                        <Select displayEmpty value={selectedSubject?.class_id || ""} onChange={handleSelectChange}>
+                        <Select displayEmpty value={selectedSubject?.class_id || "all"} onChange={handleSelectChange}>
+                            <MenuItem value="all">Chọn tất cả</MenuItem>
                             {subjects.length === 0 ? (
                                 <MenuItem disabled value="">
                                     Không có môn học
@@ -150,8 +229,17 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                 </Typography>
                 <Divider sx={{ borderBottomWidth: 2, mb: 3 }} />
                 <Stack>
-                    <Typography fontWeight={'500'} mb={1}>Mã lớp: {selectedSubject?.class_id || "N/A"}</Typography>
-                    <Typography fontWeight={'500'} mb={1}>Môn học: {selectedSubject?.subject_name || "N/A"}</Typography>
+                {selectedSubject?.class_id && (
+                    <Typography fontWeight={'500'} mb={1}>
+                        Mã lớp: {selectedSubject.class_id}
+                    </Typography>
+                )}
+
+                {selectedSubject?.subject_name && (
+                    <Typography fontWeight={'500'} mb={1}>
+                        Môn học: {selectedSubject.subject_name}
+                    </Typography>
+                )}
                     <Typography fontWeight={'500'} mb={1} >Giảng viên: {classDetails?.full_name || "N/A"}</Typography>
                     <Box sx={{display: 'flex'}}>
                         <Typography fontWeight={'500'} mb={1}>Năm học: {classDetails?.academic_year || "N/A"}</Typography>
@@ -181,7 +269,7 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                                         <TableRow>
                                             <TableCell align="center">1</TableCell>
                                             <TableCell>Tiền giảng dạy</TableCell>
-                                            <TableCell align="center">{salaryDetailsAPI.nfCredit * 15}</TableCell>
+                                            <TableCell align="center">{salaryDetailsAPI.min_lessons}</TableCell>
                                             <TableCell align="center">{salaryDetailsAPI.student_count}</TableCell>
                                             <TableCell align="center">
                                             {salaryDetailsAPI?.student_count <= 70 ? "1.0" : salaryDetailsAPI?.student_count <= 80 ? "1.2" : "1.5"}
@@ -219,7 +307,7 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                                                 Thuế khấu trừ (10%)
                                             </TableCell>
                                             <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                                                {(salaryDetailsAPI?.breakdown?.totalClassSalary * 0.1).toLocaleString()}
+                                                {((salaryDetailsAPI?.breakdown?.teachingSalary + salaryDetailsAPI?.breakdown?.gradingAllowance) * 0.1).toLocaleString()}
                                             </TableCell>
                                         </TableRow>
 
@@ -229,7 +317,7 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                                                 Số tiền được nhận
                                             </TableCell>
                                             <TableCell align="right" sx={{ fontWeight: "bold", color: "green" }}>
-                                                {(salaryDetailsAPI?.breakdown?.totalClassSalary * 0.9).toLocaleString()}
+                                                {(salaryDetailsAPI?.breakdown?.totalClassSalary - ((salaryDetailsAPI?.breakdown?.teachingSalary + salaryDetailsAPI?.breakdown?.gradingAllowance)*0.1)).toLocaleString()}
                                             </TableCell>
                                         </TableRow>
                                     </>
@@ -240,7 +328,7 @@ const SalaryDetailsCom = ({subjects = [], salarydetails}: {subjects?: ISubject[]
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                </TableBody>
+                            </TableBody>
                         </Table>
                     </TableContainer>
                 </Stack>

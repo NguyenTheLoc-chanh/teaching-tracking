@@ -18,7 +18,7 @@ export default function ClientLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeRegistry>
-          <Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh"}}>
+          <Box sx={{ display: "flex", flexDirection: "row"}}>
             
             {/* Menu bên trái - Cố định */}
             <Box
@@ -40,10 +40,10 @@ export default function ClientLayout({
             {/* Vùng chính (Header + Nội dung + Footer) */}
             <Box
               sx={{
-                marginLeft: "260px", // Đẩy nội dung qua phải do menu chiếm 260px
+                marginLeft: "260px",
                 display: "flex",
                 flexDirection: "column",
-                width: "calc(100% - 260px)", // Trừ chiều rộng menu
+                width: "calc(100% - 260px)",
                 minHeight: "100vh",
               }}
             >
@@ -69,7 +69,7 @@ export default function ClientLayout({
                 sx={{
                   padding: 3,
                   marginTop: "56px", // Đẩy xuống dưới Header
-                  height: "calc(100vh - 112px)", // Trừ header (56px) + footer (56px)
+                  height: "calc(100vh - 112px)",
                   overflowY: "auto",
                 }}
               >
