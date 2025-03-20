@@ -18,6 +18,7 @@ const LoginPage = () => {
         control,
         handleSubmit,
         formState: { errors },
+        reset
     } = useForm({
         defaultValues: {
             username: '',
@@ -31,6 +32,12 @@ const LoginPage = () => {
         // const dataLog = await signIn("credentials", {username, password, redirect: false});
         const res = await authenticate(username, password);
         if(res?.error){
+            
+            if (res.error === "Tên đăng nhập không tồn tại!") {
+                reset({ username: '', password }); // Giữ lại mật khẩu
+            } else {
+                reset({ username, password: '' }); // Xóa cả hai nếu lỗi khác
+            }
             //Error
             setErrorMessage(res.error);
             setOpen(true);
