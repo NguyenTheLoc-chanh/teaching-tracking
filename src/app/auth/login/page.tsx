@@ -12,6 +12,7 @@ import { getSession } from "next-auth/react";
 
 const LoginPage = () => {
     const [errorMessage, setErrorMessage] = useState(""); // Trạng thái thông báo lỗi
+    const [loginError, setLoginError] = useState("");
     const [open, setOpen] = useState(false); // Trạng thái mở/đóng Snackbar
     const router = useRouter();
     const {
@@ -32,11 +33,11 @@ const LoginPage = () => {
         // const dataLog = await signIn("credentials", {username, password, redirect: false});
         const res = await authenticate(username, password);
         if(res?.error){
-            
+            setLoginError(res.error);
             if (res.error === "Tên đăng nhập không tồn tại!") {
                 reset({ username: '', password }); // Giữ lại mật khẩu
             } else {
-                reset({ username, password: '' }); // Xóa cả hai nếu lỗi khác
+                reset({ username, password: '' }); 
             }
             //Error
             setErrorMessage(res.error);
@@ -200,9 +201,12 @@ const LoginPage = () => {
                     </Box>
                 </Stack>
             </Container>
+            <Box data-testid="login-error" style={{ display: 'none' }}>
+                {loginError}
+            </Box>
             {/* Snackbar hiển thị thông báo lỗi */}
-            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose} data-testid="error-snackbar">
+                <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }} data-testid="error-alert">
                     {errorMessage}
                 </Alert>
             </Snackbar>

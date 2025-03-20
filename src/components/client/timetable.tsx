@@ -133,8 +133,6 @@ const TimeTableCom = ({ weeks }: { weeks: IWeek[]}) => {
         const response = await handleConfirmServer(selectedLog, studentsPresent, content);
         const responseSalary = await CreateOrUpdateSalary(selectedLog);
 
-        console.log("Response:", response.success);
-        console.log("Response:", responseSalary.success);
         if(response.success && responseSalary.success){
             handleCloseModal();
             mutate();
