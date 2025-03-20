@@ -7,6 +7,8 @@ import edit from '../../../../images/edit.png';
 import { sendRequest } from "@/utils/api";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import axios from "axios";
+import { handleUpdateInfomation } from "./handleInfomation";
 
 interface ILecturer {
     lecturer_id: string;
@@ -36,7 +38,7 @@ const InformationPage = () => {
                         },
                     });
                     setLecturer(response.data);
-                    setEditedData(response.data); // Gán dữ liệu ban đầu vào form
+                    setEditedData({...response.data}); // Gán dữ liệu ban đầu vào form
                 } catch (error) {
                     console.error("Lỗi khi tải thông tin giảng viên:", error);
                 }
@@ -52,22 +54,19 @@ const InformationPage = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEditedData({ ...editedData, [e.target.name]: e.target.value });
     };
-
+    
     const handleSave = async () => {
-        try {
-            await sendRequest({
-                url: `http://localhost:8080/api/v1/lecturers/update`,
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session?.user?.access_token}`,
-                },
-                body: JSON.stringify(editedData),
-            });
-            setLecturer(editedData as ILecturer); // Cập nhật UI
+        const updatedData = {
+            lecturer_id: editedData.lecturer_id ?? "",
+            date_of_birth: editedData.date_of_birth ?? "",
+            address: editedData.address ?? "",
+        };  
+        const result = await handleUpdateInfomation(updatedData);
+        if (result.success) {
+            setLecturer(result.data);
             handleClose();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật thông tin:", error);
+        } else {
+            console.error("Lỗi cập nhật:", result.message);
         }
     };
 
@@ -133,28 +132,28 @@ const InformationPage = () => {
                                 {/* Thông tin cá nhân */}
                                 <Box>
                                 <Typography textAlign="center" variant="h6" fontWeight="600">
-                                    {session?.user?.lecturer?.full_name ?? "Chưa có tên"}
+                                    {session?.user?.lecturer?.full_name ?? "Đang cập nhật"}
                                 </Typography>
                                 <Typography textAlign="center" color="text.secondary">
-                                    {session?.user?.name ?? "Không có thông tin"}
+                                    {session?.user?.name ?? "Đang cập nhật"}
                                 </Typography>
                                 <Stack mt={4} direction={'row'} justifyContent={'space-around'}>
                                     <Box>
                                         <Typography color="text.secondary" mb={2}>
-                                            <b>Chức vụ:</b> {lecturer?.title ?? "Chưa có"}
+                                            <b>Chức vụ:</b> {lecturer?.title ?? "Đang cập nhật"}
                                         </Typography>
                                         <Typography color="text.secondary" mb={2}>
-                                            <b>Giới tính:</b> {lecturer?.gender === "Male" ? "Nam" : lecturer?.gender === "Female" ? "Nữ" : "Chưa cập nhật"}
+                                            <b>Giới tính:</b> {lecturer?.gender === "Male" ? "Nam" : lecturer?.gender === "Female" ? "Nữ" : "Đang cập nhật"}
                                         </Typography>
                                         <Typography color="text.secondary" mb={2}>
                                             <b>Ngày sinh:</b> {lecturer?.date_of_birth ? 
                                             dayjs(lecturer.date_of_birth).format("DD/MM/YYYY") 
-                                            : "Chưa cập nhật"}
+                                            : "Đang cập nhật"}
                                         </Typography>
                                     </Box>
                                     <Box>
                                         <Typography color="text.secondary" mb={2}>
-                                            <b>Địa chỉ:</b> {lecturer?.address ?? "Chưa có"}
+                                            <b>Địa chỉ:</b> {lecturer?.address ?? "Đang cập nhật"}
                                         </Typography>
                                     </Box>
                                 </Stack>

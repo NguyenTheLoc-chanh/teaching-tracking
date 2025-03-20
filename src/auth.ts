@@ -1,14 +1,12 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { InvalidEmailPasswordError } from "./utils/error"
+import { InactiveAccountError, InvalidPasswordError, InvalidUserNameError } from "./utils/error"
 import { sendRequest } from "./utils/api"
 import { IUser } from "./types/next-auth"
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers:  [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
         lecturer_id: { label: "Lecturer ID", type: "text" },
         password: { label: "Password", type: "password" },
@@ -22,6 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
 
+        console.log("Res:",res);
         if(res.statusCode === 201) {
           return {
             _id: res.data?.user?._id,
@@ -33,7 +32,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             access_token: res.data?.access_token
           };
         }else if(+res.statusCode === 401 ){
-          throw new InvalidEmailPasswordError();
+          throw new InvalidPasswordError();
+        }else if(+res.statusCode === 404){
+          throw new InvalidUserNameError();
         }else{
           throw new Error("Internal server error!")
         }

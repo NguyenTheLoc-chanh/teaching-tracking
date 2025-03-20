@@ -11,9 +11,15 @@ export class CustomAuthError extends AuthError {
   }
 }
 
-export class InvalidEmailPasswordError extends AuthError {
-    static type = "UserName/ PassWord không hợp lệ!"
+export class InvalidUserNameError extends AuthError {
+           name = "InvalidUserNameError";
+    static type = "Tên đăng nhập không tồn tại!"
+}
+export class InvalidPasswordError extends AuthError {
+  name = "InvalidPasswordError";
+  static type = "Mật khẩu không chính xác!"
 }
 export class InactiveAccountError extends AuthError {
+    name = "InactiveAccountError";
     static type = "Tài khoản chưa được kích hoạt!"
 }

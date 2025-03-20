@@ -116,6 +116,7 @@ export async function handleUpdateSessionServer(selectedLog: ITeachingLog, updat
     return { success: false, message: "Ngày không hợp lệ" };
   }
   const body = {
+    teaching_log_id: selectedLog.teaching_log_id,
     class_id: selectedLog.class_id,
     session: sessionNew,
     date: updateDate,

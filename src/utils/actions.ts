@@ -1,5 +1,6 @@
 'use server'
 import {signIn} from "@/auth";
+import { InactiveAccountError, InvalidPasswordError, InvalidUserNameError } from "./error";
 
 export async function authenticate(lecturer_id: string, password: string) {
     try {
@@ -11,12 +12,12 @@ export async function authenticate(lecturer_id: string, password: string) {
         })
         return r
     } catch (error) {
-        if((error as any).name === "InvalidEmailPasswordError"){
+        if(error instanceof InvalidUserNameError){
             return {
                 error: (error as any).type,
                 code: 1
             }
-        }else if((error as any).name === "InactiveAccountError"){
+        }else if(error instanceof InvalidPasswordError){
             return {
                 error: (error as any).type,
                 code: 2
