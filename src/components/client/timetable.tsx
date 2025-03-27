@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Alert, Box, Button, FormControl, InputLabel, MenuItem, Modal, Paper, Select, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/vi";
-import { CreateOrUpdateSalary, handleConfirmLeaveNoticeServer, handleConfirmServer, handleUpdateSessionServer } from "@/app/client/timetable/handleConfirm";
 import useSWR from "swr";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { CreateOrUpdateSalary, handleConfirmServer, handleUpdateSessionServer } from "@/app/client/timetable/handleConfirm";
 
 dayjs.locale("vi");
 
@@ -218,18 +218,18 @@ const TimeTableCom = ({ weeks }: { weeks: IWeek[]}) => {
                         padding: 0,
                         position: 'relative',
                         '.MuiInputLabel-root': {
-                        top: '-5px', // Điều chỉnh vị trí của InputLabel để phù hợp chiều cao
-                        fontSize: '14px', // Giảm kích thước font nếu cần
-                        lineHeight: '36px', // Căn chỉnh giữa
+                        top: '-5px', 
+                        fontSize: '14px', 
+                        lineHeight: '36px', 
                         },
                         '.MuiSelect-select': {
                         height: '36px',
-                        padding: '0 8px', // Loại bỏ padding mặc định và giữ khoảng cách nhỏ
+                        padding: '0 8px', 
                         display: 'flex',
-                        alignItems: 'center', // Căn chỉnh nội dung trong Select
+                        alignItems: 'center',
                         },
                         '.MuiOutlinedInput-notchedOutline': {
-                        border: '1px solid #ccc', // Tùy chỉnh viền nếu cần
+                        border: '1px solid #ccc',
                         height: '36px',
                         },
                     }}

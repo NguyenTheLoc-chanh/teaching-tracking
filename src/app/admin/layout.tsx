@@ -10,7 +10,7 @@ import { SnackbarProvider } from "notistack";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function ClientLayout({
+export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -65,18 +65,18 @@ export default function ClientLayout({
 
               {/* Nội dung chính - Có thể cuộn */}
               <SnackbarProvider maxSnack={3} autoHideDuration={3000} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-              <Box
-                component="main"
-                flexGrow={1}
-                sx={{
-                  padding: 3,
-                  marginTop: "56px", // Đẩy xuống dưới Header
-                  height: "calc(100vh - 112px)",
-                  overflowY: "auto",
-                }}
-              >
-                {children}
-              </Box>
+                <Box
+                  component="main"
+                  flexGrow={1}
+                  sx={{
+                    padding: 3,
+                    marginTop: "56px", // Đẩy xuống dưới Header
+                    height: "calc(100vh - 112px)",
+                    overflowY: "auto",
+                  }}
+                >
+                  {children}
+                </Box>
               </SnackbarProvider>
 
               {/* Footer - Cố định nhưng dưới Menu */}

@@ -191,8 +191,3 @@ export async function CreateOrUpdateSalary(selectedLog: ITeachingLog) {
     return { success: false, message: "Lỗi khi lấy dữ liệu lương" };
   }
 }
-
-
-
-
-

@@ -18,6 +18,7 @@ import axios from "axios";
 const ClientMenu = () =>{
     const { data: session, status } = useSession()
     const router = useRouter();
+    const role = session?.user?.role;
     
     const handleLogout = async () => {
         try {
@@ -38,7 +39,8 @@ const ClientMenu = () =>{
         }
     };
     return (
-        <Box>
+        <Box display={'flex'} justifyContent={'space-between'} flexDirection={'column'}>
+            <Box>
             <Box textAlign={'center'} mb={5}>
                 <Image src={logoHouTech} layout='intrinsic' alt='logoHou' width={150} height={50}/>
             </Box>
@@ -49,122 +51,193 @@ const ClientMenu = () =>{
                     <Typography >{session?.user?.name ?? ""}</Typography>
                 </Box>
             </Stack>
-            <Typography
-                color="white" 
-                fontWeight={"bold"}
-                mt={5}
-                mb={2}
-                >Chức năng</Typography>
-            <Link href={'/client/dashboard'} 
-                style={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    background: '#FFC20E', 
-                    borderRadius: 14, 
-                    width: 226, height: 42,
-                    textDecoration: 'none'}}>
-                <Image src={info} layout='intrinsic' alt='logoHou' 
-                    width={28} 
-                    height={20}
-                    style={{marginRight: 10, marginLeft: 20}}/>
-                <Typography color="black">Bảng thông tin</Typography>
-            </Link>
-            <Typography
-                color="white" 
-                fontWeight={"bold"}
-                mt={2}
-                mb={1}
-                >Thông tin cá nhân</Typography>
-            <Box sx={{ width: '100%', maxWidth: 360, color: '#fff'}}>
-                <nav aria-label="main mailbox folders">
-                    <List sx={{pt:0}}>
-                    <ListItem disablePadding>
-                    <Link href="/client/information" passHref 
-                        style={{textDecoration: 'none', color: '#fff'}}>
-                        <ListItemButton sx={{ pl: 0 }} component="a">
-                        <ListItemIcon>
-                            <Image
-                            src={infomation}
-                            layout="intrinsic"
-                            alt="Icons"
-                            width={22}
-                            height={22}
-                            />
-                        </ListItemIcon>
-                        <ListItemText primary="Sơ yếu lý lịch" />
-                        </ListItemButton>
+            {role !=='Admin' &&(
+                <>
+                    <Typography
+                        color="white" 
+                        fontWeight={"bold"}
+                        mt={5}
+                        mb={2}
+                        >Chức năng</Typography>
+                    <Link href={'/client/dashboard'} 
+                        style={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            background: '#FFC20E', 
+                            borderRadius: 14, 
+                            width: 226, height: 42,
+                            textDecoration: 'none'}}>
+                        <Image src={info} layout='intrinsic' alt='logoHou' 
+                            width={28} 
+                            height={20}
+                            style={{marginRight: 10, marginLeft: 20}}/>
+                        <Typography color="black">Bảng thông tin</Typography>
                     </Link>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <Link href="/client/salaries" passHref 
-                            style={{textDecoration: 'none', color: '#fff'}}>
-                            <ListItemButton sx={{pl: 0}}>
+                    <Typography
+                        color="white" 
+                        fontWeight={"bold"}
+                        mt={2}
+                        mb={1}
+                        >Thông tin cá nhân</Typography>
+                    <Box sx={{ width: '100%', maxWidth: 360, color: '#fff'}}>
+                        <nav aria-label="main mailbox folders">
+                            <List sx={{pt:0}}>
+                            <ListItem disablePadding>
+                            <Link href="/client/information" passHref 
+                                style={{textDecoration: 'none', color: '#fff'}}>
+                                <ListItemButton sx={{ pl: 0 }} component="a">
                                 <ListItemIcon>
-                                    <Image src={book} layout='intrinsic' alt='Icons' 
-                                        width={22} 
-                                        height={22}/>
+                                    <Image
+                                    src={infomation}
+                                    layout="intrinsic"
+                                    alt="Icons"
+                                    width={22}
+                                    height={22}
+                                    />
                                 </ListItemIcon>
-                                <ListItemText primary="Xem bảng lương" />
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
-                    </List>
-                </nav>
-            </Box>
-            <Typography
-                color="white" 
-                fontWeight={"bold"}
-                mt={2}
-                mb={1}
-                >Thông tin giảng dạy</Typography>
-            <Box sx={{ width: '100%', maxWidth: 360, color: '#fff'}}>
-                <nav aria-label="main mailbox folders">
-                    <List sx={{pt:0}}>
-                    <ListItem disablePadding>
-                    <Link href="/client/timetable" passHref 
-                        style={{textDecoration: 'none', color: '#fff'}}>
-                        <ListItemButton sx={{pl: 0}}>
-                            <ListItemIcon>
-                                <Image src={book} layout='intrinsic' alt='Icons' 
-                                    width={22} 
-                                    height={22}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Xem lịch giảng dạy" />
-                        </ListItemButton>
+                                <ListItemText primary="Sơ yếu lý lịch" />
+                                </ListItemButton>
+                            </Link>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <Link href="/client/salaries" passHref 
+                                    style={{textDecoration: 'none', color: '#fff'}}>
+                                    <ListItemButton sx={{pl: 0}}>
+                                        <ListItemIcon>
+                                            <Image src={book} layout='intrinsic' alt='Icons' 
+                                                width={22} 
+                                                height={22}/>
+                                        </ListItemIcon>
+                                        <ListItemText primary="Xem bảng lương" />
+                                    </ListItemButton>
+                                </Link>
+                            </ListItem>
+                            </List>
+                        </nav>
+                    </Box>
+                    <Typography
+                        color="white" 
+                        fontWeight={"bold"}
+                        mt={2}
+                        mb={1}
+                        >Thông tin giảng dạy</Typography>
+                    <Box sx={{ width: '100%', maxWidth: 360, color: '#fff'}}>
+                        <nav aria-label="main mailbox folders">
+                            <List sx={{pt:0}}>
+                            <ListItem disablePadding>
+                            <Link href="/client/timetable" passHref 
+                                style={{textDecoration: 'none', color: '#fff'}}>
+                                <ListItemButton sx={{pl: 0}}>
+                                    <ListItemIcon>
+                                        <Image src={book} layout='intrinsic' alt='Icons' 
+                                            width={22} 
+                                            height={22}/>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Xem lịch giảng dạy" />
+                                </ListItemButton>
+                            </Link>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <Link href="/client/semestercalendar" passHref 
+                                    style={{textDecoration: 'none', color: '#fff'}}>
+                                    <ListItemButton sx={{pl: 0}}>
+                                        <ListItemIcon>
+                                            <Image src={book} layout='intrinsic' alt='Icons' 
+                                                width={22} 
+                                                height={22}/>
+                                        </ListItemIcon>
+                                        <ListItemText primary="Xem lịch học kỳ" />
+                                    </ListItemButton>
+                                </Link>
+                            </ListItem>
+                            </List>
+                        </nav>
+                    </Box>
+                </>
+            )}
+
+            {role ==='Admin' &&(
+                <>
+                    <Typography
+                        color="white" 
+                        fontWeight={"bold"}
+                        mt={5}
+                        mb={2}
+                        >Chức năng</Typography>
+                    <Link href={'/client/dashboard'} 
+                        style={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            background: '#FFC20E', 
+                            borderRadius: 14, 
+                            width: 226, height: 42,
+                            textDecoration: 'none'}}>
+                        <Image src={info} layout='intrinsic' alt='logoHou' 
+                            width={28} 
+                            height={20}
+                            style={{marginRight: 10, marginLeft: 20}}/>
+                        <Typography color="black">Bảng thông tin</Typography>
                     </Link>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <Link href="/client/semestercalendar" passHref 
-                            style={{textDecoration: 'none', color: '#fff'}}>
-                            <ListItemButton sx={{pl: 0}}>
-                                <ListItemIcon>
-                                    <Image src={book} layout='intrinsic' alt='Icons' 
-                                        width={22} 
-                                        height={22}/>
-                                </ListItemIcon>
-                                <ListItemText primary="Xem lịch học kỳ" />
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
-                    </List>
-                </nav>
+                    <Typography
+                        color="white" 
+                        fontWeight={"bold"}
+                        mt={2}
+                        mb={1}
+                        >Chức năng</Typography>
+                    <Box sx={{ width: '100%', maxWidth: 360, color: '#fff'}}>
+                        <nav aria-label="main mailbox folders">
+                            <List sx={{pt:0}}>
+                            <ListItem disablePadding>
+                            <Link href="/admin/createtimetable" passHref 
+                                style={{textDecoration: 'none', color: '#fff'}}>
+                                <ListItemButton sx={{pl: 0}}>
+                                    <ListItemIcon>
+                                        <Image src={book} layout='intrinsic' alt='Icons' 
+                                            width={22} 
+                                            height={22}/>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Lập thời khóa biểu" />
+                                </ListItemButton>
+                            </Link>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <Link href="/admin/report" passHref 
+                                    style={{textDecoration: 'none', color: '#fff'}}>
+                                    <ListItemButton sx={{pl: 0}}>
+                                        <ListItemIcon>
+                                            <Image src={book} layout='intrinsic' alt='Icons' 
+                                                width={22} 
+                                                height={22}/>
+                                        </ListItemIcon>
+                                        <ListItemText primary="Báo cáo" />
+                                    </ListItemButton>
+                                </Link>
+                            </ListItem>
+                            </List>
+                        </nav>
+                    </Box>
+                </>
+            )}
             </Box>
-            <Button 
-                onClick={handleLogout} 
-                sx={{
-                    mt: 8,
-                    width: "100%",
-                    backgroundColor: "#FF0000",
-                    boxShadow: "13px 4px 14px rgba(0, 0, 0, 0.12)",
-                    borderRadius: "14px",
-                    color: "white",
-                    fontWeight: "bold",
-                    "&:hover": {
-                        backgroundColor: "#D00000",
-                    },
-                }}>
-                Đăng xuất
-            </Button>
+            <Box>
+                <Button 
+                    onClick={handleLogout} 
+                    sx={{
+                        mb:2,
+                        mt: 8,
+                        width: "100%",
+                        backgroundColor: "#FF0000",
+                        boxShadow: "13px 4px 14px rgba(0, 0, 0, 0.12)",
+                        borderRadius: "14px",
+                        color: "white",
+                        fontWeight: "bold",
+                        "&:hover": {
+                            backgroundColor: "#D00000",
+                        },
+                    }}>
+                    Đăng xuất
+                </Button>
+            </Box>
         </Box>
     )
 }

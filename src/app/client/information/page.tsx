@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
 import { handleUpdateInfomation } from "./handleInfomation";
+import { enqueueSnackbar } from "notistack";
 
 interface ILecturer {
     lecturer_id: string;
@@ -54,6 +55,22 @@ const InformationPage = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEditedData({ ...editedData, [e.target.name]: e.target.value });
     };
+    const fetchLecturerInfo = async () => {
+        if (session?.user?.access_token) {
+            try {
+                const response = await sendRequest<{ statusCode: number; data: ILecturer }>({
+                    url: `http://localhost:8080/api/v1/lecturers/infolecturer`,
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${session?.user?.access_token}`,
+                    },
+                });
+                setLecturer(response.data); // Cập nhật UI với dữ liệu mới
+            } catch (error) {
+                console.error("Lỗi khi tải thông tin giảng viên:", error);
+            }
+        }
+    };
     
     const handleSave = async () => {
         const updatedData = {
@@ -63,10 +80,12 @@ const InformationPage = () => {
         };  
         const result = await handleUpdateInfomation(updatedData);
         if (result.success) {
+            enqueueSnackbar("Cập nhật thông tin thành công!", { variant: "success" });
             setLecturer(result.data);
+            fetchLecturerInfo();
             handleClose();
         } else {
-            console.error("Lỗi cập nhật:", result.message);
+            enqueueSnackbar("Cập nhật không thành công!", { variant: "error" });
         }
     };
 
@@ -185,6 +204,7 @@ const InformationPage = () => {
                         fullWidth
                         value={editedData.full_name ?? ""}
                         onChange={handleChange}
+                        disabled
                     />
                     <TextField
                         label="Ngày sinh"
@@ -202,9 +222,14 @@ const InformationPage = () => {
                         value={editedData.address ?? ""}
                         onChange={handleChange}
                     />
-                    <Button variant="contained" color="primary" onClick={handleSave}>
-                        Lưu thay đổi
-                    </Button>
+                    <Stack direction="row" spacing={2} justifyContent="flex-end">
+                        <Button variant="outlined" color="error" onClick={handleClose}>
+                            Hủy
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={handleSave}>
+                            Lưu thay đổi
+                        </Button>
+                    </Stack>
                 </Stack>
             </Box>
         </Modal>
